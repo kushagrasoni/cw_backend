@@ -1,0 +1,294 @@
+@startuml
+
+'https://plantuml.com/deployment-diagram
+title CodeWeaver - PySpark Code Generation Software Architecture
+
+'!includeurl plantuml.sketchtl.art/code/UML/Simple_Standard_Colors.puml
+
+
+'card card [
+'<i><color:blue>Technology Stack</color></i>
+'====
+'User Interface
+'----
+'ReactJS: React 18, NodeJS 16
+'....
+'HTML
+'....
+'CSS
+'====
+'Backend
+'----
+'Python: Version 11
+'....
+'FastAPI
+'====
+'AI Modeling
+'----
+'Azure OpenAI
+'....
+'Kore.ai
+']
+
+actor User as "Data Analyst"
+
+file STM_File
+
+rectangle UI as "Frontend UI"  {
+    component Uploader as "STM Upload"
+    card Code_Display
+}
+
+rectangle Preprocessor as "Pre-Processor" {
+    component Extractor as "STM Data Extractor"
+    component Formatter as "Data Formatter"
+
+
+    database Formatted_STM_Data
+
+    frame Prompt_Engineering as "Prompt Engineering" {
+        component Prompt_Gen as "Prompt Generator"
+    '    artifact Context as "Contextual Information"
+    '    artifact Code_Templates as "Code Templates"
+    '    component Evaluation as "Code Quality Evaluation"
+    }
+
+
+
+    artifact Final_Code
+}
+
+
+cloud Cloud_Platform as "Cloud Based AI Platform" #line.dashed {
+    component Azure_PNC #line.dashed
+    component OpenAI as "Open AI"
+
+}
+
+
+
+frame Local_AI_Model as "On-Prem Platform" #line.dashed {
+    component Kore_AI #line.dashed
+}
+'frame Local_AI_Model as "Local Generative AI Pipeline" #line.dashed {
+'
+''    rectangle GenAI_Module as "Generative Model" {
+''        folder Data_Preparation {
+''          package STM_To_Code_Dataset as "PySpark Code Dataset"
+''          collections Training_Dataset
+''          collections Validation_Dataset
+''          collections Test_Dataset
+''        }
+''        component AI_Model as "Llama2 or \nSimilar Model"
+''
+''    }
+''
+''    STM_To_Code_Dataset -do-> Training_Dataset
+''    STM_To_Code_Dataset -do-> Validation_Dataset
+''    STM_To_Code_Dataset -do-> Test_Dataset
+'
+''    Training_Dataset --> AI_Model
+''    Generated_Code <-up- AI_Model
+''    Generated_Code ~up~> AI_Model
+'
+'    component GenAI_Module as "Generative Model"
+'    artifact Generated_Code as "Generated Code"
+'
+'    GenAI_Module -> Generated_Code
+'
+'    rectangle Post_Processor {
+'        component Analyzer
+'    }
+'
+'    Generated_Code -> Post_Processor : Code Analysis
+'    Test_Dataset --> Analyzer
+'}
+
+
+
+
+
+User -> STM_File : (1). Creates STM
+STM_File -> Uploader : (2). Uploads mapping file
+Uploader --> Extractor : (3). Sends mapping file
+Extractor -do-> Formatter
+Formatter -> Formatted_STM_Data : (4). Sends processed data
+Formatted_STM_Data ~do~> Prompt_Gen : (5)
+Prompt_Gen ~> Kore_AI : (6)
+'Prompt_Gen ~> Cloud_Platform : (6)
+Azure_PNC <-> OpenAI : (7)
+Kore_AI ~~> Azure_PNC : (8)
+Cloud_Platform ~> Final_Code : (9)
+Final_Code -> Code_Display : (10)
+
+
+
+
+frame Data_Platform as "BDP - Hadoop Cluster" #line.dashed {
+    file Code as "PySpark code"
+
+    rectangle Job_Runner as "Job Runner" #line.dashed {
+        component Code_Executor as  "Execute Code"
+        component Table_Creator as "Create Table"
+        Code_Executor -do-> Table_Creator
+    }
+
+    database Target_Database as "Target Table" {
+    }
+
+    database Source_Databases as "Source Database(s)" {
+    }
+
+    frame Validation {
+        component PyDAT
+    }
+
+    frame Synth_Data_Gen {
+        component Hydra
+    }
+
+    Hydra ~~> Source_Databases
+    Code ~~> Job_Runner : Sends generated PySpark code
+    Source_Databases -> Code_Executor : Reads source data
+    Table_Creator -> Target_Database : Creates target table
+    Source_Databases -> PyDAT
+    Target_Database -> PyDAT
+
+}
+
+
+<style>
+actor {
+  BackGroundColor #ea9999
+  LineThickness 1
+  LineColor black
+}
+agent {
+  BackGroundColor #f80c12
+  LineThickness 1
+  LineColor black
+}
+artifact {
+  BackGroundColor #80ff00
+  LineThickness 1
+  LineColor black
+}
+boundary {
+  BackGroundColor #ee1100
+  LineThickness 1
+  LineColor black
+}
+card {
+  BackGroundColor #ffbf00
+  LineThickness 1
+  LineColor black
+}
+circle {
+  BackGroundColor #ff3311
+  LineThickness 1
+  LineColor black
+}
+cloud {
+  BackGroundColor #e6ffff
+  LineThickness 1
+  LineColor black
+}
+collections {
+  BackGroundColor #00ffbf
+  LineThickness 1
+  LineColor black
+}
+component {
+  BackGroundColor #9fc5e8
+  LineThickness 1
+  LineColor black
+}
+control {
+  BackGroundColor #ff6644
+  LineThickness 1
+  LineColor black
+}
+database {
+  BackGroundColor #ffd966
+  LineThickness 1
+  LineColor black
+}
+entity {
+  BackGroundColor #feae2d
+  LineThickness 1
+  LineColor black
+}
+file {
+  BackGroundColor #feae2d
+  LineThickness 1
+  LineColor black
+}
+folder {
+  BackGroundColor #ccbb33
+  LineThickness 1
+  LineColor black
+}
+frame {
+  BackGroundColor #ccf2ff
+  LineThickness 1
+  LineColor black
+}
+hexagon {
+  BackGroundColor #aacc22
+  LineThickness 1
+  LineColor black
+}
+interface {
+  BackGroundColor #69d025
+  LineThickness 1
+  LineColor black
+}
+label {
+  BackGroundColor black
+  LineThickness 1
+  LineColor black
+}
+node {
+  BackGroundColor #22ccaa
+  LineThickness 1
+  LineColor black
+}
+package {
+  BackGroundColor #16e9e6
+  LineThickness 1
+  LineColor black
+}
+person {
+  BackGroundColor #11aabb
+  LineThickness 1
+  LineColor black
+}
+queue {
+  BackGroundColor #11aabb
+  LineThickness 1
+  LineColor black
+}
+rectangle {
+  BackGroundColor #d9ead3
+  LineThickness 1
+  LineColor black
+}
+stack {
+  BackGroundColor #3311bb
+  LineThickness 1
+  LineColor black
+}
+storage {
+  BackGroundColor #3b0cbd
+  LineThickness 1
+  LineColor black
+}
+usecase {
+  BackGroundColor #442299
+  LineThickness 1
+  LineColor black
+}
+</style>
+
+
+@enduml

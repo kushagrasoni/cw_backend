@@ -6,15 +6,15 @@ from dotenv import load_dotenv
 load_dotenv()
 
 client = AzureOpenAI(
-    azure_endpoint="https://cgi-openai-resource-kushagra.openai.azure.com/",
-    api_key=os.environ.get("AZURE_OPENAI_KEY"),
-    api_version="2024-02-15-preview"
+    azure_endpoint=os.environ.get("AZURE_OPENAI_ENDPOINT"),
+    api_key=os.environ.get("AZURE_OPENAI_API_KEY"),
+    api_version=os.environ.get("AZURE_OPENAI_VERSION"),
 )
 
 # Constants
 OPENAI_MODEL = "cgi_openai_gpt_35_turbo"
 OPENAI_MAX_TOKENS = 800
-OPENAI_TEMPERATURE = 0.7
+OPENAI_TEMPERATURE = 0.8
 OPENAI_N = 1
 OPENAI_TOP_P = 0.95
 OPENAI_STOP = None
@@ -26,7 +26,7 @@ def get_output(prompt):
                      }]
 
     completion = client.chat.completions.create(
-        model="cgi_openai_gpt_35_turbo",
+        model=os.environ.get("AZURE_OPENAI_DEPLOYMENT"),
         messages=message_text,
         temperature=OPENAI_TEMPERATURE,
         max_tokens=OPENAI_MAX_TOKENS,

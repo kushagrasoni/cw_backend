@@ -146,8 +146,8 @@ def generate_prompt(source_tables, source_columns, transformations, target_table
     # Construct a clear and concise prompt for OpenAI
     # Consider including relevant information like table names, column names,
     # and desired transformations
-    prompt = f"Write PySpark code to transform data from the following tables and corresponding columns " \
-             f"and then write the transformed data it into a Hive table named '{target_table}':\n"
+    prompt = f"Write a PySpark code to using following tables and corresponding columns transformations." \
+             f"Also write the transformed data into a Hive table named '{target_table}':\n"
     for i in range(len(source_tables)):
         prompt += f"- {source_tables[i]}.{source_columns[i]}\n"
     prompt += "\nApply the following transformations:\n"

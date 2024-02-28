@@ -1,0 +1,182 @@
+@startuml
+
+'https://plantuml.com/deployment-diagram
+title CodeWeaver POC - PySpark Code Generation Logical Architecture
+
+actor User as "Data Analyst"
+
+file STM_File
+
+rectangle UI as "Frontend - ReactJS UI"  {
+    component Uploader as "STM Upload"
+    component Code_Display
+}
+
+rectangle Preprocessor as "Backend - FastAPI" {
+    component Extractor as "STM Data Extractor"
+    component Formatter as "Data Formatter"
+
+    database STM_Data as "STM Data"
+
+    component Prompt_Gen as "Prompt Generator"
+
+    queue REST_Client as "REST Client"
+
+    artifact Final_Code
+}
+
+
+cloud Cloud_Platform as "Azure OpenAI" {
+    component Azure_API as "Azure OpenAI API"
+    hexagon OpenAI as "GPT 3.5 Turbo\nModel"
+}
+
+
+User -> STM_File : (1). Creates STM
+STM_File -> Uploader : (2). Uploads mapping file
+Uploader --> Extractor : (3). Sends to backend
+Extractor -do-> Formatter : (4). Extract Useful Data
+Formatter -do-> STM_Data : (5). Formatted Data
+STM_Data -le-> Prompt_Gen : (6). Generate Prompt
+Prompt_Gen -up-> REST_Client : (7). Prompt Generated
+REST_Client <-le-> Cloud_Platform : (8). Communicate with\nAzure Platform
+Azure_API <--> OpenAI
+REST_Client -up-> Final_Code : (9). Code Generated
+Final_Code -> Code_Display : (10). Sent to UI
+
+
+<style>
+actor {
+  BackGroundColor #ea9999
+  LineThickness 1
+  LineColor black
+}
+agent {
+  BackGroundColor #f80c12
+  LineThickness 1
+  LineColor black
+}
+artifact {
+  BackGroundColor #00e673
+  LineThickness 1
+  LineColor black
+}
+boundary {
+  BackGroundColor #ee1100
+  LineThickness 1
+  LineColor black
+}
+card {
+  BackGroundColor #ffbf00
+  LineThickness 1
+  LineColor black
+}
+circle {
+  BackGroundColor #ff3311
+  LineThickness 1
+  LineColor black
+}
+cloud {
+  BackGroundColor #e6ffff
+  LineThickness 1
+  LineColor black
+}
+collections {
+  BackGroundColor #00ffbf
+  LineThickness 1
+  LineColor black
+}
+component {
+  BackGroundColor #9fc5e8
+  LineThickness 1
+  LineColor black
+}
+control {
+  BackGroundColor #ff6644
+  LineThickness 1
+  LineColor black
+}
+database {
+  BackGroundColor #feae2d
+  LineThickness 1
+  LineColor black
+}
+entity {
+  BackGroundColor #feae2d
+  LineThickness 1
+  LineColor black
+}
+file {
+  BackGroundColor #feae2d
+  LineThickness 1
+  LineColor black
+}
+folder {
+  BackGroundColor #ccbb33
+  LineThickness 1
+  LineColor black
+}
+frame {
+  BackGroundColor #ccf2ff
+  LineThickness 1
+  LineColor black
+}
+hexagon {
+  BackGroundColor #e1d584
+  LineThickness 1
+  LineColor black
+}
+interface {
+  BackGroundColor #69d025
+  LineThickness 1
+  LineColor black
+}
+label {
+  BackGroundColor black
+  LineThickness 1
+  LineColor black
+}
+node {
+  BackGroundColor #22ccaa
+  LineThickness 1
+  LineColor black
+}
+package {
+  BackGroundColor #16e9e6
+  LineThickness 1
+  LineColor black
+}
+person {
+  BackGroundColor #11aabb
+  LineThickness 1
+  LineColor black
+}
+queue {
+  BackGroundColor #9fc5e8
+  LineThickness 1
+  LineColor black
+}
+rectangle {
+  BackGroundColor #d9ead3
+  LineThickness 1
+  LineColor black
+}
+stack {
+  BackGroundColor #3311bb
+  LineThickness 1
+  LineColor black
+}
+storage {
+  BackGroundColor #3b0cbd
+  LineThickness 1
+  LineColor black
+}
+usecase {
+  BackGroundColor #442299
+  LineThickness 1
+  LineColor black
+}
+</style>
+
+
+@enduml

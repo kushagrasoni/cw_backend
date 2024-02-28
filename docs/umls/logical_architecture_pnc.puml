@@ -1,7 +1,7 @@
 @startuml
 
 'https://plantuml.com/deployment-diagram
-title CodeWeaver - PySpark Code Generation Software Architecture
+title CodeWeaver - PySpark Code Generation Logical Architecture
 
 '!includeurl plantuml.sketchtl.art/code/UML/Simple_Standard_Colors.puml
 
@@ -34,43 +34,44 @@ actor User as "Data Analyst"
 
 file STM_File
 
-rectangle UI as "Frontend UI"  {
+rectangle UI as "Frontend - ReactJS UI"  {
     component Uploader as "STM Upload"
-    card Code_Display
+    component Code_Display
 }
 
-rectangle Preprocessor as "Pre-Processor" {
+rectangle Preprocessor as "Backend - FastAPI" {
     component Extractor as "STM Data Extractor"
     component Formatter as "Data Formatter"
 
-
     database Formatted_STM_Data
 
-    frame Prompt_Engineering as "Prompt Engineering" {
-        component Prompt_Gen as "Prompt Generator"
-    '    artifact Context as "Contextual Information"
-    '    artifact Code_Templates as "Code Templates"
-    '    component Evaluation as "Code Quality Evaluation"
-    }
+    component Prompt_Gen as "Prompt Generator"
 
+'    folder Prompt_Engineering as "Prompt Engineering" {
+'
+'    '    artifact Context as "Contextual Information"
+'    '    artifact Code_Templates as "Code Templates"
+'    '    component Evaluation as "Code Quality Evaluation"
+'    }
 
+    queue REST_Client as "REST Client"
 
     artifact Final_Code
 }
 
 
-cloud Cloud_Platform as "Cloud Based AI Platform" #line.dashed {
-    component Azure_PNC #line.dashed
-    component OpenAI as "Open AI"
-
+cloud Cloud_Platform as "Private Cloud Platform" {
+    component Azure_Cloud as "Azure/AWS"
+    component OpenAI as "GPT 3.5 Model"
 }
 
 
 
-frame Local_AI_Model as "On-Prem Platform" #line.dashed {
-    component Kore_AI #line.dashed
+
+frame Local_AI_Model as "On-Prem Platform" {
+    component Kore_AI as "KoreAI /\nAny Moderator"
 }
-'frame Local_AI_Model as "Local Generative AI Pipeline" #line.dashed {
+'frame Local_AI_Model as "Local Generative AI Pipeline" {
 '
 ''    rectangle GenAI_Module as "Generative Model" {
 ''        folder Data_Preparation {
@@ -89,7 +90,7 @@ frame Local_AI_Model as "On-Prem Platform" #line.dashed {
 '
 ''    Training_Dataset --> AI_Model
 ''    Generated_Code <-up- AI_Model
-''    Generated_Code ~up~> AI_Model
+''    Generated_Code -up-> AI_Model
 '
 '    component GenAI_Module as "Generative Model"
 '    artifact Generated_Code as "Generated Code"
@@ -105,56 +106,18 @@ frame Local_AI_Model as "On-Prem Platform" #line.dashed {
 '}
 
 
-
-
-
 User -> STM_File : (1). Creates STM
 STM_File -> Uploader : (2). Uploads mapping file
-Uploader --> Extractor : (3). Sends mapping file
-Extractor -do-> Formatter
-Formatter -> Formatted_STM_Data : (4). Sends processed data
-Formatted_STM_Data ~do~> Prompt_Gen : (5)
-Prompt_Gen ~> Kore_AI : (6)
-'Prompt_Gen ~> Cloud_Platform : (6)
-Azure_PNC <-> OpenAI : (7)
-Kore_AI ~~> Azure_PNC : (8)
-Cloud_Platform ~> Final_Code : (9)
-Final_Code -> Code_Display : (10)
-
-
-
-
-frame Data_Platform as "BDP - Hadoop Cluster" #line.dashed {
-    file Code as "PySpark code"
-
-    rectangle Job_Runner as "Job Runner" #line.dashed {
-        component Code_Executor as  "Execute Code"
-        component Table_Creator as "Create Table"
-        Code_Executor -do-> Table_Creator
-    }
-
-    database Target_Database as "Target Table" {
-    }
-
-    database Source_Databases as "Source Database(s)" {
-    }
-
-    frame Validation {
-        component PyDAT
-    }
-
-    frame Synth_Data_Gen {
-        component Hydra
-    }
-
-    Hydra ~~> Source_Databases
-    Code ~~> Job_Runner : Sends generated PySpark code
-    Source_Databases -> Code_Executor : Reads source data
-    Table_Creator -> Target_Database : Creates target table
-    Source_Databases -> PyDAT
-    Target_Database -> PyDAT
-
-}
+Uploader --> Extractor : (3). Sends to backend
+Extractor -do-> Formatter : (4). Extract Useful Data
+Formatter -do-> Formatted_STM_Data : (5). Formatted Data
+Formatted_STM_Data -le-> Prompt_Gen : (6). Generate Prompt
+Prompt_Gen -up-> REST_Client : (7). Prompt Generated
+REST_Client <-> Local_AI_Model : (8). Communicate with Moderator
+Kore_AI -up-> Azure_Cloud : (9). Moderator to Cloud Platform
+Azure_Cloud <-> OpenAI
+REST_Client -up-> Final_Code : (10). Code Generated
+Final_Code -> Code_Display : (11). Sent to UI
 
 
 <style>
@@ -169,7 +132,7 @@ agent {
   LineColor black
 }
 artifact {
-  BackGroundColor #80ff00
+  BackGroundColor #00e673
   LineThickness 1
   LineColor black
 }
@@ -209,7 +172,7 @@ control {
   LineColor black
 }
 database {
-  BackGroundColor #ffd966
+  BackGroundColor #feae2d
   LineThickness 1
   LineColor black
 }
@@ -234,7 +197,7 @@ frame {
   LineColor black
 }
 hexagon {
-  BackGroundColor #aacc22
+  BackGroundColor #e1d584
   LineThickness 1
   LineColor black
 }
@@ -264,7 +227,7 @@ person {
   LineColor black
 }
 queue {
-  BackGroundColor #11aabb
+  BackGroundColor #9fc5e8
   LineThickness 1
   LineColor black
 }

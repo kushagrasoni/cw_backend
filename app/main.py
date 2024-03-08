@@ -3,13 +3,14 @@ import uuid
 import pandas as pd
 
 import uvicorn
-from fastapi import FastAPI, UploadFile, File, Request, Response, HTTPException, Form
+from fastapi import FastAPI, UploadFile, File, Response, HTTPException, Form
 
 import os
 
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.services import azure_openai, openai_api
+from app.services import azure_openai
+# from app.services import openai_api
 
 
 
@@ -84,7 +85,7 @@ async def upload_file(file: UploadFile = File(...),
 
 
 @app.get("/api/retrieve")
-async def retrieve_code():
+async def retrieve_code(filename=None):
     """
     Retrieves the generated PySpark code from a temporary file.
 

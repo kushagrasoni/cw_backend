@@ -30,6 +30,7 @@ title CodeWeaver - PySpark Code Generation Logical Architecture
 'Kore.ai
 ']
 
+
 actor User as "Data Analyst"
 
 file STM_File
@@ -117,8 +118,43 @@ REST_Client <-> Local_AI_Model : (8). Communicate with Moderator
 Kore_AI -up-> Azure_Cloud : (9). Moderator to Cloud Platform
 Azure_Cloud <-> OpenAI
 REST_Client -up-> Final_Code : (10). Code Generated
-Final_Code -> Code_Display : (11). Sent to UI
+Final_Code --> Code_Display : (11). Sent to UI
 
+
+
+frame Data_Platform as "BDP - Hadoop Cluster" {
+    file Code as "PySpark code"
+
+    rectangle Job_Runner as "Job Runner" {
+        component Code_Executor as  "Execute Code"
+        component Table_Creator as "Create Table"
+        Code_Executor -do-> Table_Creator
+    }
+
+    database Target_Database as "Target Table"{
+    }
+
+    database Source_Databases as "Source Database(s)" {
+    }
+
+    frame Validation{
+        component PyDAT
+    }
+
+    frame Synth_Data_Gen {
+        component Hydra
+    }
+
+    Hydra --> Source_Databases
+    Code --> Job_Runner : Sends generated PySpark code
+    Source_Databases -> Code_Executor : Reads source data
+    Table_Creator -> Target_Database : Creates target table
+    Source_Databases -> PyDAT
+    Target_Database -> PyDAT
+
+}
+
+Final_Code -le-> Code
 
 <style>
 actor {

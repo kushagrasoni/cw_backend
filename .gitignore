@@ -1,2 +1,5 @@
 /venv_311_cw_backend/
 /.idea/
+/cw_backend.iml
+/test_main.http
+/.env
